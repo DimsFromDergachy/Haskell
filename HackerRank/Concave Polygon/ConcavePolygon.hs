@@ -1,5 +1,7 @@
 -- https://www.hackerrank.com/challenges/lambda-march-concave-polygon/problem
 
+module ConcavePolygon (main) where
+
 import Control.Monad (replicateM)
 import Data.Function (on)
 import Data.List (group, sortBy)
