@@ -1,6 +1,6 @@
 -- https://www.hackerrank.com/challenges/lambda-march-concave-polygon/problem
 
-module ConcavePolygon (main) where
+module ConcavePolygon (main, solve) where
 
 import Control.Monad (replicateM)
 import Data.Function (on)
@@ -28,16 +28,19 @@ sort ps  =  sortBy compareByAngle' ps
     angle' (x0, y0)  =  \(x, y) -> atan2 (y - y0) (x - x0)
     compareByAngle'  =  compare `on` (angle' (middle ps) . fromIntegral')
 
-solve :: [Point] -> Bool
-solve  =  not . null . tail . group . filter (/= 0) . zipWith' cross' . zipWith' vector'
+concave :: [Point] -> Bool
+concave  =  not . null . tail . group . filter (/= 0) . zipWith' cross' . zipWith' vector'
   where
     zipWith' f xs  =  zipWith f xs (tail $ cycle xs)
     vector' (x1, y1) (x2, y2)  =  (x2 - x1, y2 - y1)
     cross'  (a1, b1) (a2, b2)  =  signum $ a1 * b2 - a2 * b1
+
+solve :: [Point] -> Bool
+solve  =  concave . sort
 
 prints :: Bool -> IO ()
 prints True   =  putStrLn "YES"
 prints False  =  putStrLn "NO"
 
 main :: IO()
-main  =  reads >>= pure . solve . sort >>= prints
+main  =  reads >>= pure . solve >>= prints
