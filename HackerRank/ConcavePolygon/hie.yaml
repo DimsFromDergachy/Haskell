@@ -1,0 +1,6 @@
+cradle:
+    cabal:
+        - path: "."
+          component: "lib:ConcavePolygon"
+        - path: "./test"
+          component: "test:ConcavePolygon-test"
