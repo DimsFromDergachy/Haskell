@@ -9,7 +9,7 @@ assertIsConcave    s  =  assertBool s . not
 assertIsNotConcave s  =  assertBool s
 
 tests :: TestTree
-tests  =  testGroup "Tests"
+tests  =  testGroup "All tests"
   [
     testCase' "Triangle" assertIsConcave [0,0, 0,1, 1,0],
     testCase' "Sample Input" assertIsConcave [0,0, 0,1, 1,1, 1,0],
@@ -19,6 +19,7 @@ tests  =  testGroup "Tests"
     testCase' "No concave" assertIsNotConcave [0,0, 3,0, 1,1, 0,3],
     testCase' "Zero cross #1" assertIsConcave [0,0, 2,0, 2,2, 0,2, 0,1],
     testCase' "Zero cross #2" assertIsConcave [0,0, 1,0, 2,0, 2,1, 2,2, 1,2, 0,2, 0,1],
+    testCase' "Zero cross no concave" assertIsNotConcave [0,0, 3,0, 1,1, 0,3, 0,2],
     testCase' "Mix vertex" assertIsConcave [0,0, 1,1, 0,1, 1,0]
   ]
 
