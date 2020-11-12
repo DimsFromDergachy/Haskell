@@ -27,4 +27,8 @@ test-suite ConcavePolygon-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             ConcavePolygonTests.hs
-  build-depends:       base ^>=4.13.0.0, HUnit, ConcavePolygon
+  build-depends:       base ^>=4.13.0.0,
+                       ConcavePolygon,
+                       HUnit,
+                       tasty >= 1.4,
+                       tasty-hunit >= 0.10,
