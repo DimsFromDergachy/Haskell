@@ -1,25 +1,14 @@
 cabal-version:       2.4
 
 name:                ConcavePolygon
-version:             0.1.0.0
--- synopsis:
--- description:
--- bug-reports:
-license:             NONE
-license-file:        LICENSE
+version:             1.0
 author:              Dmitry Tyurnikov
 maintainer:          DimsFromDergachy@gmail.com
--- copyright:
--- category:
 build-type:          Simple
--- extra-source-files:  CHANGELOG.md
 
 library
   exposed-modules:     ConcavePolygon
-  -- other-modules:
-  -- other-extensions:
   build-depends:       base ^>=4.13.0.0
-  -- hs-source-dirs:
   default-language:    Haskell2010
 
 test-suite ConcavePolygon-test
@@ -29,6 +18,5 @@ test-suite ConcavePolygon-test
   main-is:             ConcavePolygonTests.hs
   build-depends:       base ^>=4.13.0.0,
                        ConcavePolygon,
-                       --HUnit,
                        tasty >= 1.4,
                        tasty-hunit >= 0.10,
