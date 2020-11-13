@@ -39,4 +39,6 @@ jobs:
         cabal build ConcavePolygon --enable-tests --enable-benchmarks
         cabal build Fibonacci      --enable-tests --enable-benchmarks
     - name: Run tests
-      run: cabal test ConcavePolygon --test-show-details=always --test-option=--color=always
+      run: |
+        cabal test ConcavePolygon --test-show-details=always --test-option=--color=always
+        cabal test Fibonacci      --test-show-details=always --test-option=--color=always
