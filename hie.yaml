@@ -1,6 +1,6 @@
 cradle:
     cabal:
-        - path: "."
+        - path: "./HackerRank/ConcavePolygon"
           component: "lib:ConcavePolygon"
-        - path: "./test"
+        - path: "./HackerRank/ConcavePolygon/test"
           component: "test:ConcavePolygon-test"
