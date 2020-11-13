@@ -1,0 +1,12 @@
+cabal-version:       2.4
+
+name:                Fibonacci
+version:             1.0
+author:              Dmitry Tyurnikov
+maintainer:          DimsFromDergachy@gmail.com
+
+library
+  exposed-modules:     Fibonacci
+  build-depends:       base ^>=4.13.0.0,
+  default-language:    Haskell2010
+

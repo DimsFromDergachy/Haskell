@@ -6,6 +6,8 @@
 -- -------------------------
 --  [1, 2, 3, 5, 8, 13 ...]
 
+module Fibonacci where
+
 import Control.Monad (replicateM_)
 
 fibonacci :: [Int]
