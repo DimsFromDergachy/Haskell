@@ -1,6 +1,12 @@
 cradle:
     cabal:
+      # ConcavePolygon
         - path: "./HackerRank/ConcavePolygon"
           component: "lib:ConcavePolygon"
         - path: "./HackerRank/ConcavePolygon/test"
           component: "test:ConcavePolygon-test"
+      # Fibonacci
+        - path: "./HackerRank/Fibonacci"
+          component: "lib:Fibonacci"
+        - path: "./HackerRank/Fibonacci/test"
+          component: "test:Fibonacci-test"
