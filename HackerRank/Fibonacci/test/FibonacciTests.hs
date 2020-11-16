@@ -4,6 +4,7 @@ import Fibonacci (fibonacci)
 import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.Options
+import Test.Tasty.QuickCheck
 
 simpleTests :: TestTree
 simpleTests  =  testGroup "Fibonacci's tests"
@@ -28,8 +29,21 @@ allNumbersTests  =  testGroup "Fibonacci's test all numbers"
   where
     test n exp  =  testCase (show n) $ assertEqual "" exp (fibonacci !! n)
 
+quickCheckTests :: TestTree
+quickCheckTests  =  testGroup "Test by QuickCheck"
+  [
+    testProperty "∀ n ≥ 0: F(n+2) == F(n+1) + F(n)" $
+        \n -> n >= 0 ==> fib (n+2) == fib (n+1) + fib n,
+    testProperty "∀ n ≥ 0: F(n) ≥ 0" $
+        \n -> n >= 0 ==> fib n >= 0,
+    testProperty "∀ n ≥ 0: F(n+1) ≥ F(n)" $
+        \n -> n >= 0 ==> fib (n+1) >= fib n
+  ]
+  where
+    fib n  =  fibonacci !! n
+
 unitTests :: TestTree
-unitTests  =  testGroup "Unit tests" [simpleTests, allNumbersTests]
+unitTests  =  testGroup "Unit tests" [simpleTests, allNumbersTests, quickCheckTests]
 
 main :: IO ()
 main  =  defaultMain unitTests
