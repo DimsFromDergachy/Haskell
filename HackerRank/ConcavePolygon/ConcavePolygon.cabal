@@ -11,7 +11,7 @@ library
   build-depends:       base ^>=4.13.0.0
   default-language:    Haskell2010
 
-test-suite ConcavePolygon-test
+test-suite ConcavePolygon-UnitTests
   default-language:    Haskell2010
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
@@ -20,3 +20,13 @@ test-suite ConcavePolygon-test
                        ConcavePolygon,
                        tasty >= 1.4,
                        tasty-hunit >= 0.10,
+
+test-suite ConcavePolygon-QuickCheckTests
+  default-language:    Haskell2010
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             ConcavePolygonPropertyTests.hs
+  build-depends:       base ^>=4.13.0.0,
+                       ConcavePolygon,
+                       tasty >= 1.4,
+                       tasty-quickcheck >= 0.10
