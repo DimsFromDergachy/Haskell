@@ -11,22 +11,23 @@ type Points = [Point]
 
 newtype Polygon = Polygon Points
   deriving (Show, Eq)
-newtype Triangle = Triangle Points
+data Triangle = Triangle Point Point Point
   deriving (Show, Eq)
 
 instance Arbitrary Triangle
   where
-    arbitrary = Triangle <$> suchThat (vectorOf 3 arbitrary) isTriangle
+    arbitrary = flip suchThat isTriangle
+        $ Triangle <$> arbitrary <*> arbitrary <*> arbitrary
       where
         -- ABC is triangle ⇔ AB · BC != 0
-        isTriangle [(x1,y1), (x2,y2), (x3,y3)] = (x2 - x1) * (y3 - y1) /= (x3 - x1) * (y2 - y1)
+        isTriangle (Triangle (x1,y1) (x2,y2) (x3,y3)) = (x2 - x1) * (y3 - y1) /= (x3 - x1) * (y2 - y1)
 
 instance Arbitrary Polygon
   where
     arbitrary = do
-      (Triangle ts) <- arbitrary :: Gen Triangle
+      (Triangle p1 p2 p3) <- arbitrary :: Gen Triangle
       ps <- listOf arbitrary :: Gen Points
-      Polygon <$> shuffle (ts ++ ps)
+      Polygon <$> shuffle (p1 : p2 : p3 : ps)
 
 data ShuffleVertexes = ShuffleVertexes Points Points
   deriving (Show, Eq)
@@ -40,12 +41,11 @@ instance Arbitrary ShuffleVertexes
 
 -- Tests --
 
-isConcave :: Bool -> Bool
-isConcave = id
-
 triangleTest :: TestTree
 triangleTest = testProperty "Triangle is always not a concave polygon"
-    $ \(Triangle ps) -> not $ isConcave $ solve $ ps
+    $ \(Triangle p1 p2 p3) -> isNotConcave $ solve $ [p1, p2, p3]
+  where
+    isNotConcave = not
 
 polygonTest :: TestTree
 polygonTest = testProperty "Classify random polygons (no test)"
