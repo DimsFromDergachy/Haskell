@@ -29,15 +29,18 @@ allNumbersTests  =  testGroup "Fibonacci's test all numbers"
   where
     test n exp  =  testCase (show n) $ assertEqual "" exp (fibonacci !! n)
 
+f :: NonNegative a
+f = undefined
+
 quickCheckTests :: TestTree
 quickCheckTests  =  testGroup "Test by QuickCheck"
   [
-    testProperty "∀ n ≥ 0: F(n+2) == F(n+1) + F(n)" $
-        \n -> n >= 0 ==> fib (n+2) == fib (n+1) + fib n,
-    testProperty "∀ n ≥ 0: F(n) ≥ 0" $
-        \n -> n >= 0 ==> fib n >= 0,
-    testProperty "∀ n ≥ 0: F(n+1) ≥ F(n)" $
-        \n -> n >= 0 ==> fib (n+1) >= fib n
+    testProperty "The main spec: ∀ n ≥ 0: F(n) + F(n+1) % 10^8 + 7 == F(n+2)" $
+        \(NonNegative n) -> (fib n + fib (n+1)) `mod` (10^8+7) == fib (n+2),
+    testProperty "Not negative: ∀ n ≥ 0: F(n) ≥ 0" $
+        \(NonNegative n) -> fib n >= 0,
+    testProperty "Monotonic: ∀ n ∈ [0 .. 38]: F(n+1) ≥ F(n)" $
+        \(NonNegative n) -> n < 39 ==> fib (n+1) >= fib n
   ]
   where
     fib n  =  fibonacci !! n
