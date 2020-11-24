@@ -39,6 +39,18 @@ instance Arbitrary ShuffleVertexes
       ps' <- shuffle ps
       pure $ ShuffleVertexes ps ps'
 
+data ScaleVertexes = ScaleVertexes (Int, Int) Points Points
+  deriving (Show, Eq)
+
+instance Arbitrary ScaleVertexes
+  where
+    arbitrary = do
+      (Polygon ps) <- arbitrary
+      kx <- suchThat arbitrary (/= 0)
+      ky <- suchThat arbitrary (/= 0)
+      let scaledPs = map (\(x, y) -> (kx * x, ky * y)) ps
+      pure $ ScaleVertexes (kx, ky) ps scaledPs
+
 -- Tests --
 
 triangleTest :: TestTree
@@ -47,20 +59,25 @@ triangleTest = testProperty "Triangle is always not a concave polygon"
   where
     isNotConcave = not
 
-polygonTest :: TestTree
-polygonTest = testProperty "Classify random polygons (no test)"
+classifyPolygons :: TestTree
+classifyPolygons = testProperty "Classify random polygons (no test)"
     $ \(Polygon ps) -> classify (solve ps) "is concave" $ True
 
 shuffleVertexes :: TestTree
 shuffleVertexes = testProperty "Shuffle vertexes doesn't change the type"
     $ \(ShuffleVertexes p1 p2) -> solve p1 == solve p2
 
+scaleVertexes :: TestTree
+scaleVertexes = testProperty "Scale vertexes doesn't change the type"
+    $ \(ScaleVertexes ks ps1 ps2) -> solve ps1 == solve ps2
+
 tests :: TestTree
 tests = testGroup "Test by QuickCheck:"
   [
     triangleTest,
-    polygonTest,
-    shuffleVertexes
+    classifyPolygons,
+    shuffleVertexes,
+    scaleVertexes
   ]
 
 main :: IO ()
