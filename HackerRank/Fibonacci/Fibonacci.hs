@@ -10,11 +10,11 @@ module Fibonacci where
 
 import Control.Monad (replicateM_)
 
-fibonacci :: [Int]
-fibonacci  =  0 : 1 : zipWith (+%) fibonacci (tail fibonacci)
-  where
-    (+%) :: Int -> Int -> Int
-    (+%) a b  =  (a + b) `mod` (10^8 + 7)
+fibonacci :: [Integer]
+fibonacci  =  0 : 1 : zipWith (+) fibonacci (tail fibonacci)
+
+solve :: Int -> Integer
+solve = (`mod` (10^8 + 7)) . (fibonacci !!)
 
 main :: IO ()
-main  =  readLn >>= flip replicateM_ (readLn >>= print . (fibonacci !!))
+main  =  readLn >>= flip replicateM_ (readLn >>= print . solve)
