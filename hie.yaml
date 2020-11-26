@@ -3,8 +3,10 @@ cradle:
       # ConcavePolygon
         - path: "./HackerRank/ConcavePolygon"
           component: "lib:ConcavePolygon"
-        - path: "./HackerRank/ConcavePolygon/test"
-          component: "test:ConcavePolygon-test"
+        - path: "./HackerRank/ConcavePolygon/test/ConcavePolygonTests.hs"
+          component: "test:ConcavePolygon-UnitTests"
+        - path: "./HackerRank/ConcavePolygon/test/ConcavePolygonPropertyTests.hs"
+          component: "test:ConcavePolygon-QuickCheckTests"
       # Fibonacci
         - path: "./HackerRank/Fibonacci"
           component: "lib:Fibonacci"
