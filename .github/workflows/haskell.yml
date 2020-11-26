@@ -34,11 +34,13 @@ jobs:
       run: |
         cabal update
         cabal build all --only-dependencies --enable-tests --enable-benchmarks
-    - name: Build
-      run: |
-        cabal build ConcavePolygon --enable-tests --enable-benchmarks
-        cabal build Fibonacci      --enable-tests --enable-benchmarks
-    - name: Run tests
-      run: |
-        cabal test ConcavePolygon --test-show-details=always --test-option=--color=always
-        cabal test Fibonacci      --test-show-details=always --test-option=--color=always
+
+    - name: Build 'ConcavePolygon'
+      run:  cabal build ConcavePolygon --enable-tests --enable-benchmarks
+    - name: Run test 'ConcavePolygon'
+      run:  cabal test ConcavePolygon --test-show-details=always --test-option=--color=always
+
+    - name: Build 'Fibonacci'
+      run: cabal build Fibonacci --enable-tests --enable-benchmarks
+    - name: Run test 'Fibonacci'
+      run: cabal test Fibonacci --test-show-details=always --test-option=--color=always
