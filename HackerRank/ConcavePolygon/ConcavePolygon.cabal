@@ -8,7 +8,7 @@ build-type:          Simple
 
 library
   exposed-modules:     ConcavePolygon
-  build-depends:       base ^>=4.13.0.0
+  build-depends:       base >= 4.13.0.0
   default-language:    Haskell2010
 
 test-suite ConcavePolygon-UnitTests
@@ -16,7 +16,7 @@ test-suite ConcavePolygon-UnitTests
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             ConcavePolygonTests.hs
-  build-depends:       base ^>=4.13.0.0,
+  build-depends:       base >= 4.13.0.0,
                        ConcavePolygon,
                        tasty >= 1.4,
                        tasty-hunit >= 0.10,
@@ -26,7 +26,7 @@ test-suite ConcavePolygon-QuickCheckTests
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             ConcavePolygonPropertyTests.hs
-  build-depends:       base ^>=4.13.0.0,
+  build-depends:       base >= 4.13.0.0,
                        ConcavePolygon,
                        tasty >= 1.4,
                        tasty-quickcheck >= 0.10
