@@ -2,8 +2,11 @@
 
 -- ⚀ ⚁ ⚂ ⚃ ⚄ ⚅
 
+module DicePath where
+
 import Control.Monad (replicateM_)
 import Prelude hiding (Right)
+import Data.Functor ((<&>))
 
 -- Top, Front, Left, Right, Back, Down
 data Face = T | F | L | R | B | D
@@ -54,4 +57,4 @@ solve m n  =  fst $ a m n
 main :: IO ()
 main  =  readLn >>= flip replicateM_ (reads' >>= print . uncurry solve)
   where
-    reads'  =  getLine >>= pure . (\[x, y] -> (x, y)) . map read . words
+    reads'  =  getLine <&> (\[x, y] -> (x, y)) . map read . words
