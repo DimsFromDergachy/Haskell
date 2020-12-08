@@ -4,9 +4,7 @@
 solve :: (Int, Int) -> [String] -> Integer
 solve (x, y) = fromIntegral . length . filter (== '#') . zipWith (\n s -> (cycle s) !! n) [0, y..] . filterBy x
   where
-    filterBy 1 xs = xs
-    filterBy 2 (x:_:xs) = x : (filterBy 2 xs)
-    filterBy 2 _ = []
+    filterBy n = map snd . filter ((== 0) . (`mod` n) . fst) . zip [0..]
 
 partI :: [String] -> Integer
 partI = solve (1, 3)
