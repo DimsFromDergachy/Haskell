@@ -3,11 +3,6 @@ name: Advent Of Code
 on:
   push:
     branches: [ main ]
-    tags: [AdventOfCode]
-
-on:
-  push:
-    branches: [ main ]
     paths:
     - '**/AdventOfCode/**'
 
