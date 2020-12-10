@@ -18,4 +18,4 @@ partII xs = head $ do
   pure (x * y * z)
 
 main :: IO ()
-main = readFile "day1.input" >>= pure . map read . words >>= print . partII
+main = getContents >>= pure . map read . words >>= print . partII
