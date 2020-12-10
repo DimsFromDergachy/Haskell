@@ -24,9 +24,9 @@ jobs:
         ghc-version: '8.10.2'
         cabal-version: '3.4'
 
-    - name: Build Day 1: Report Repair
+    - name: Build 'Day 1 - Report Repair'
       run:  ghc Day1.hs
       working-directory: ./AdventOfCode/2020
-    - name: Run - Day 1: Report Repair
+    - name: Run 'Day 1 - Report Repair'
       run: ./Day1 < ./input/day1
       working-directory: ./AdventOfCode/2020
