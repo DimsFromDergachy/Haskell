@@ -5,11 +5,18 @@ on:
     branches: [ main ]
     paths:
     - '**/AdventOfCode/**'
+    - '.github/workflows/adventofcode.yml'
 
+env:
+  BASE_URL: https://adventofcode.com
+  SESSION_ID: ${{ secrets.ADVENTOFCODE_SESSION_ID }}
+
+defaults:
+  run:
+    working-directory: ./AdventOfCode/2020
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -21,7 +28,7 @@ jobs:
 
     - name: Build 'Day 1 - Report Repair'
       run:  ghc Day1.hs
-      working-directory: ./AdventOfCode/2020
+    - name: Download input file for 'Day 1'
+      run: curl -b "session=${SESSION_ID}" ${BASE_URL}/2020/day/1/input > input1
     - name: Run 'Day 1 - Report Repair'
-      run: ./Day1 < ./input/day1
-      working-directory: ./AdventOfCode/2020
+      run: ./Day1 < ./input1
