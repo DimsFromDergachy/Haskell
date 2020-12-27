@@ -9,4 +9,13 @@ A pet project which helps to solve small katas (puzzles) on Haskell. Powered by 
 
 ![Haskell CI](https://github.com/DimsFromDergachy/Haskell/workflows/Haskell%20CI/badge.svg)
 
-![Advent Of Code](https://github.com/DimsFromDergachy/Haskell/workflows/Advent%20Of%20Code/badge.svg)
+## Advent Of Code 2020
+
+![Advent Of Code 2020](https://github.com/DimsFromDergachy/Haskell/workflows/Advent%20Of%20Code/badge.svg)
+
+| The Day | Part One | Part Two | Results |
+| ------- | :------: | :------: | ------: |
+| Day 1 | 482811 | 193171814 | ⭐⭐ |
+| Day 2 | 474 | 745 | ⭐⭐ |
+| Day 3 | 228 | 6818112000 | ⭐⭐ |
+| Day 4 | | | |
