@@ -20,6 +20,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    outputs:
+      result: ${{ steps.run.outputs.result }}
+
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-haskell@v1
@@ -27,9 +30,14 @@ jobs:
         ghc-version: '8.10.2'
         cabal-version: '3.4'
 
-    - name: Build 'Day ${DAY}'
+    - name: Day
+      run : echo 'Day number is ${Day}'
+    - name: Build
       run:  ghc Day${DAY}.hs
-    - name: Download input file for 'Day ${DAY}'
+    - name: Download input file
       run: curl -b "session=${SESSION_ID}" ${BASE_URL}/2020/day/${DAY}/input > input
-    - name: Run 'Day ${DAY}'
-      run: ./Day${DAY} < ./input
+    - name: Run
+      id: run
+      run: |
+        ./Day${DAY} < input > output
+        output=$(cat output); echo '::set-output name=result::'$output
