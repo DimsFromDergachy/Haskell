@@ -10,6 +10,7 @@ on:
 env:
   BASE_URL: https://adventofcode.com
   SESSION_ID: ${{ secrets.ADVENTOFCODE_SESSION_ID }}
+  DAY: 1
 
 defaults:
   run:
@@ -26,9 +27,9 @@ jobs:
         ghc-version: '8.10.2'
         cabal-version: '3.4'
 
-    - name: Build 'Day 1 - Report Repair'
-      run:  ghc Day1.hs
-    - name: Download input file for 'Day 1'
-      run: curl -b "session=${SESSION_ID}" ${BASE_URL}/2020/day/1/input > input1
-    - name: Run 'Day 1 - Report Repair'
-      run: ./Day1 < ./input1
+    - name: Build 'Day ${DAY}'
+      run:  ghc Day${DAY}.hs
+    - name: Download input file for 'Day ${DAY}'
+      run: curl -b "session=${SESSION_ID}" ${BASE_URL}/2020/day/${DAY}/input > input
+    - name: Run 'Day ${DAY}'
+      run: ./Day${DAY} < ./input
