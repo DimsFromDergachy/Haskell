@@ -38,16 +38,4 @@ jobs:
       run: curl -b "session=${SESSION_ID}" ${BASE_URL}/2020/day/${DAY}/input > input
     - name: Run
       id: run
-      run: |
-        ./Day${DAY} < input > output
-        output=$(cat output); echo '::set-output name=result::'$output
-    - name: Update Readme
-      run: |
-        search="\(\| Day "${DAY}" \|\)\(.*\)\(\|.*\)\(\|.*\|\)"
-        replace="\1\ ${{ steps.run.outputs.result }}\ \3\4"
-        script="s/"$search"/"$replace"/1"
-        echo $script
-        sed --quiet --posix -E "s/\(\| Day 1 \|\)\(.*\)\(\|.*\)\(\|.*\|\)/\1\ 193171814\ \3\4/1" README.md
-        cat README.md
-        git status
-      working-directory: .
+      run: ./Day${DAY} < input
