@@ -14,8 +14,8 @@ A pet project which helps to solve small katas (puzzles) on Haskell. Powered by 
 ![Advent Of Code 2020](https://github.com/DimsFromDergachy/Haskell/workflows/Advent%20Of%20Code/badge.svg)
 
 | The Day | Part One | Part Two | Results |
-| ------- | :------: | :------: | ------: |
+| ------- | :------: | :------: | :------: |
 | Day 1 | 482811 | 193171814 | ⭐⭐ |
 | Day 2 | 474 | 745 | ⭐⭐ |
 | Day 3 | 228 | 6818112000 | ⭐⭐ |
-| Day 4 | | | |
+| Day 4 | 208 | | ⭐ |
