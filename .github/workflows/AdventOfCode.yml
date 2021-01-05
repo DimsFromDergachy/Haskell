@@ -5,7 +5,7 @@ on:
     branches: [ main ]
     paths:
     - '**/AdventOfCode/**'
-    - '.github/workflows/adventofcode.yml'
+    - '.github/workflows/AdventOfCode.yml'
 
 env:
   BASE_URL: https://adventofcode.com
