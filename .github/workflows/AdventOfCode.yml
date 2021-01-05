@@ -10,7 +10,7 @@ on:
 env:
   BASE_URL: https://adventofcode.com
   SESSION_ID: ${{ secrets.ADVENTOFCODE_SESSION_ID }}
-  DAY: 1
+  DAY: 4
 
 defaults:
   run:
