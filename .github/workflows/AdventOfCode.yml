@@ -30,12 +30,13 @@ jobs:
         ghc-version: '8.10.2'
         cabal-version: '3.4'
 
-    - name: Day
-      run : echo 'Day number is ${Day}'
+    - name: Install dependencies
+      run: |
+        cabal update
+        cabal build AdventOfCode2020:Day${DAY} --only-dependencies --enable-tests --enable-benchmarks
     - name: Build
-      run:  ghc Day${DAY}.hs
+      run:  cabal build AdventOfCode2020:Day${DAY} --enable-tests --enable-benchmarks
     - name: Download input file
       run: curl -b "session=${SESSION_ID}" ${BASE_URL}/2020/day/${DAY}/input > input
     - name: Run
-      id: run
-      run: ./Day${DAY} < input
+      run: cabal run AdventOfCode2020:Day${DAY} < input
