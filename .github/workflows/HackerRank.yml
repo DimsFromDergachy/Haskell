@@ -1,10 +1,12 @@
-name: Haskell CI
+name: Hacker Rank
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    paths:
+    - '**/HackerRank/**'
+    - '.github/workflows/HackerRank.yml'
+
 
 jobs:
   build:
