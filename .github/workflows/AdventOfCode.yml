@@ -46,4 +46,6 @@ jobs:
         output=$(cabal --verbose=0 run AdventOfCode${YEAR}:Day${DAY} < input)
         echo '::set-output name=result::'$output
     - name: Post the answer
-      run: curl -X POST -d "level=${PART}&answer=${{ steps.run.outputs.result }}" --raw -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR}/day/${DAY}/answer
+      run: |
+        curl -# -X POST -d "level=${PART}&answer=${{ steps.run.outputs.result }}" --raw -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR}/day/${DAY}/answer > result
+        cat result | grep '<article>'
