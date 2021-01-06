@@ -57,7 +57,7 @@ hgt' = do
     hgt <- read <$> munch1 isDigit
     unit <- string "in" +++ string "cm"
     guard $ unit == "cm" && 150 <= hgt && hgt <= 193
-    guard $ unit == "in" && 59 <= hgt && hgt <= 76
+         || unit == "in" && 59 <= hgt && hgt <= 76
     pure ()
 hcl' = do
     string "hcl"
