@@ -10,7 +10,9 @@ on:
 env:
   BASE_URL: https://adventofcode.com
   SESSION_ID: ${{ secrets.ADVENTOFCODE_SESSION_ID }}
+  YEAR: 2020
   DAY: 6
+  PART: 2
 
 defaults:
   run:
@@ -33,10 +35,15 @@ jobs:
     - name: Install dependencies
       run: |
         cabal update
-        cabal build AdventOfCode2020:Day${DAY} --only-dependencies --enable-tests --enable-benchmarks
+        cabal build AdventOfCode${YEAR}:Day${DAY} --only-dependencies --enable-tests --enable-benchmarks
     - name: Build
-      run:  cabal build AdventOfCode2020:Day${DAY} --enable-tests --enable-benchmarks
+      run:  cabal build AdventOfCode${YEAR}:Day${DAY} --enable-tests --enable-benchmarks
     - name: Download input file
-      run: curl -b "session=${SESSION_ID}" ${BASE_URL}/2020/day/${DAY}/input > input
+      run: curl -# -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR}/day/${DAY}/input > input
     - name: Run
-      run: cabal run AdventOfCode2020:Day${DAY} < input
+      id: run
+      run: |
+        output=$(cabal --verbose=0 run AdventOfCode${YEAR}:Day${DAY} < input)
+        echo '::set-output name=result::'$output
+    - name: Post the answer
+      run: curl -X POST -d "level=${PART}&answer=${{ steps.run.outputs.result }}" --raw -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR}/day/${DAY}/answer
