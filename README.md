@@ -19,3 +19,4 @@ A pet project which helps to solve small katas (puzzles) on Haskell. Powered by 
 | Day 2 | 474 | 745 | ⭐⭐ |
 | Day 3 | 228 | 6818112000 | ⭐⭐ |
 | Day 4 | 208 | 167 | ⭐⭐ |
+| Day 5 | 978 | 727 | ⭐⭐ |
