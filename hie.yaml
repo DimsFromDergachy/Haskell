@@ -19,4 +19,4 @@ cradle:
           component: "test:DicePath-UnitTest"
       # Advent Of Code 2020
         - path: "./AdventOfCode/2020"
-          component: "AdventOfCode2020:exe:Day5"
+          component: "AdventOfCode2020:exe:Day6"
