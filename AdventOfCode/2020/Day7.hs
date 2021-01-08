@@ -2,7 +2,7 @@
 -- https://adventofcode.com/2020/day/7
 
 import Data.Char ( isLetter )
-import Data.Graph.DGraph ( DGraph, fromArcsList )
+import Data.Graph.DGraph ( DGraph, fromArcsList, transpose )
 import Data.Graph.Traversal (dfsVertices)
 import Data.Graph.Types ( Arc(..) )
 import Data.Maybe ( fromJust )
@@ -39,7 +39,7 @@ buildGraph = fromArcsList . concatMap (ruleToArcs . parseLine)
     ruleToArcs (bag, bags) = map (uncurry . flip $ Arc bag) bags
 
 partA :: [String] -> Int
-partA = pred . length . flip dfsVertices shinyGold . buildGraph
+partA = pred . length . flip dfsVertices shinyGold . transpose . buildGraph
 
 main :: IO()
 main = getContents >>= print . partA . lines
