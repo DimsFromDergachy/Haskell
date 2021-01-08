@@ -2,11 +2,17 @@
 -- https://adventofcode.com/2020/day/7
 
 import Data.Char ( isLetter )
-import Data.Graph ( graphFromEdges, reachable, transposeG )
+import Data.Graph.DGraph ( DGraph, fromArcsList )
+import Data.Graph.Traversal (dfsVertices)
+import Data.Graph.Types ( Arc(..) )
 import Data.Maybe ( fromJust )
 
 type Bag = (String, String)
-type Rule = (Bag, [Bag])
+type Rule = (Bag, [(Int, Bag)])
+type Graph = DGraph Bag Int
+
+shinyGold :: Bag
+shinyGold = ("shiny", "gold")
 
 chunk :: Int -> [a] -> [[a]]
 chunk _ [] = []
@@ -21,25 +27,19 @@ parseLine line
   | length ws == 7 = ((shade, color), [])
 -- 'vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.'
 -- Invariant: rest always has 4x elements, second & third are a bag
-  | otherwise = ((shade, color), [(sh, cs) | [_, sh, cs, _] <- chunks])
+  | otherwise = ((shade, color), map chunkToRule $ chunk 4 rest)
   where
     ws@(shade:color:_:_:rest) = words line
-    chunks = chunk 4 rest
+    chunkToRule [count, shade, color, _] = (read count, (shade, color))
 
-toKey :: Bag -> String
-toKey = uncurry (++)
-
-parseNode :: String -> ((), String, [String])
-parseNode line = ((), key, keys)
+buildGraph :: [String] -> Graph
+buildGraph = fromArcsList . concatMap (ruleToArcs . parseLine)
   where
-    (bag, bags) = parseLine line
-    (key, keys) = (toKey bag, map toKey bags)
+    ruleToArcs :: (Bag, [(Int, Bag)]) -> [Arc Bag Int]
+    ruleToArcs (bag, bags) = map (uncurry . flip $ Arc bag) bags
 
 partA :: [String] -> Int
-partA ss = pred $ length $ reachable (transposeG graph) vertex
-  where
-    (graph, _, vertexFromKey) = graphFromEdges $ map parseNode ss
-    vertex = fromJust $ vertexFromKey $ toKey ("shiny", "gold")
+partA = pred . length . flip dfsVertices shinyGold . buildGraph
 
 main :: IO()
 main = getContents >>= print . partA . lines
