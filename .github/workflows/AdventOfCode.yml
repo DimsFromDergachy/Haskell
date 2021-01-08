@@ -33,6 +33,7 @@ jobs:
         cabal-version: '3.4'
 
     - name: Cache
+      id: cache
       uses: actions/cache@v1
       env:
         cache-name: cache-cabal
@@ -45,9 +46,11 @@ jobs:
           ${{ runner.os }}-
 
     - name: Install dependencies
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         cabal update
         cabal build AdventOfCode${YEAR}:Day${DAY} --only-dependencies --enable-tests --enable-benchmarks
+
     - name: Build
       run:  cabal build AdventOfCode${YEAR}:Day${DAY} --enable-tests --enable-benchmarks
     - name: Download input file
