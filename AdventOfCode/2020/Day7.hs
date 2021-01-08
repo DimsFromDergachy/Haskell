@@ -2,7 +2,7 @@
 -- https://adventofcode.com/2020/day/7
 
 import Data.Char ( isLetter )
-import Data.Graph ( graphFromEdges, reachable )
+import Data.Graph ( graphFromEdges, reachable, transposeG )
 import Data.Maybe ( fromJust )
 
 type Bag = (String, String)
@@ -36,7 +36,7 @@ parseNode line = ((), key, keys)
     (key, keys) = (toKey bag, map toKey bags)
 
 partA :: [String] -> Int
-partA ss = pred $ length $ reachable graph vertex
+partA ss = pred $ length $ reachable (transposeG graph) vertex
   where
     (graph, _, vertexFromKey) = graphFromEdges $ map parseNode ss
     vertex = fromJust $ vertexFromKey $ toKey ("shiny", "gold")
