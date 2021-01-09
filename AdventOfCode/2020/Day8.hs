@@ -1,9 +1,9 @@
 -- Day 8: Handheld Halting
 -- https://adventofcode.com/2020/day/8
 
-import Data.Array ( (!), Array, bounds, listArray )
+import Data.Array ( (//), (!), Array, bounds, indices, listArray )
 import Data.Char ( isSpace )
-import Data.Either ( fromLeft )
+import Data.Either ( isRight, fromLeft, fromRight )
 import Data.Set ( empty, insert, member )
 import Text.ParserCombinators.ReadP
 
@@ -56,5 +56,18 @@ execute program = execute' 0 1 empty
 partA :: Program -> Int
 partA = fromLeft undefined . execute
 
+fixOp :: Op -> Op
+fixOp op = case op of
+    Nop x -> Jmp x
+    Jmp x -> Nop x
+    op -> op
+
+partB :: Program -> Int
+partB program = fromRight undefined $ head $ filter isRight
+    -- TODO: Use Lens for changing array
+    [execute $ program // [(ix, fixOp (program ! ix))] | ix <- indices program]
+  where
+    (_, n) = bounds program
+
 main :: IO()
-main = getContents >>= print . partA . parseProgram . lines
+main = getContents >>= print . partB . parseProgram . lines
