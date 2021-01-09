@@ -16,7 +16,7 @@ acc :: ReadP Op
 acc = do
     string "acc"
     skipSpaces
-    optional $ char '+'
+    munch (== '+')
     arg <- munch1 $ not . isSpace
     pure $ Acc $ read arg
 
@@ -24,7 +24,7 @@ jmp :: ReadP Op
 jmp = do
     string "jmp"
     skipSpaces
-    optional $ char '+'
+    munch (== '+')
     arg <- munch1 $ not . isSpace
     pure $ Jmp $ read arg
 
