@@ -1,13 +1,20 @@
 -- Day 8: Handheld Halting
 -- https://adventofcode.com/2020/day/8
 
-import Data.Array ( (!), listArray )
+import Data.Array ( (!), Array, bounds, listArray )
 import Data.Char ( isSpace )
+import Data.Either ( fromLeft )
 import Data.Set ( empty, insert, member )
 import Text.ParserCombinators.ReadP
 
 data Op = Nop | Acc Int | Jmp Int
   deriving Eq
+
+type Program = Array Int Op
+
+-- Left acc - infinity loop
+-- Right acc - terminated execution
+type Result = Either Int Int
 
 nop :: ReadP Op
 nop = Nop <$ string "nop"
@@ -28,24 +35,31 @@ jmp = do
     arg <- munch1 $ not . isSpace
     pure $ Jmp $ read arg
 
-parser :: ReadP Op
-parser = choice [nop, acc, jmp]
+parserOp :: ReadP Op
+parserOp = choice [nop, acc, jmp]
 
-parse :: String -> Op
-parse = fst . head . readP_to_S parser
+parseOp :: String -> Op
+parseOp = fst . head . readP_to_S parserOp
 
-partA :: [String] -> Int 
-partA lines = execute 0 1 empty
+parseProgram :: [String] -> Program
+parseProgram lines = listArray (1, length lines) $ map parseOp lines
+
+execute :: Program -> Result
+execute program = execute' 0 1 empty
   where
-    program = listArray (1, length lines) $ map parse lines
-    execute acc ir set
-      | ir `member` set = acc
+    (_, n) = bounds program
+    execute' acc ir set
+      | ir > n = Right acc -- Normal termination
+      | ir `member` set = Left acc -- Infinity loop
       | otherwise = case program ! ir of
-            Nop -> execute acc (ir + 1) set'
-            Acc x -> execute (acc + x) (ir + 1) set'
-            Jmp x -> execute acc (ir + x) set'
+            Nop -> execute' acc (ir + 1) set'
+            Acc x -> execute' (acc + x) (ir + 1) set'
+            Jmp x -> execute' acc (ir + x) set'
       where
         set' = insert ir set
 
+partA :: Program -> Int
+partA = fromLeft undefined . execute
+
 main :: IO()
-main = getContents >>= print . partA . lines
+main = getContents >>= print . partA . parseProgram . lines
