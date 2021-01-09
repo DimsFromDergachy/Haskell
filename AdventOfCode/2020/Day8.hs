@@ -7,7 +7,7 @@ import Data.Either ( fromLeft )
 import Data.Set ( empty, insert, member )
 import Text.ParserCombinators.ReadP
 
-data Op = Nop | Acc Int | Jmp Int
+data Op = Nop Int | Acc Int | Jmp Int
   deriving Eq
 
 type Program = Array Int Op
@@ -16,27 +16,22 @@ type Program = Array Int Op
 -- Right acc - terminated execution
 type Result = Either Int Int
 
-nop :: ReadP Op
+nop :: ReadP (Int -> Op)
 nop = Nop <$ string "nop"
 
-acc :: ReadP Op
-acc = do
-    string "acc"
-    skipSpaces
-    munch (== '+')
-    arg <- munch1 $ not . isSpace
-    pure $ Acc $ read arg
+acc :: ReadP (Int -> Op)
+acc = Acc <$ string "acc"
 
-jmp :: ReadP Op
-jmp = do
-    string "jmp"
-    skipSpaces
-    munch (== '+')
-    arg <- munch1 $ not . isSpace
-    pure $ Jmp $ read arg
+jmp :: ReadP (Int -> Op)
+jmp = Jmp <$ string "jmp"
 
 parserOp :: ReadP Op
-parserOp = choice [nop, acc, jmp]
+parserOp = do
+    op <- choice [nop, acc, jmp]
+    skipSpaces
+    munch (== '+')
+    arg <- munch1 $ not . isSpace
+    pure $ op $ read arg
 
 parseOp :: String -> Op
 parseOp = fst . head . readP_to_S parserOp
@@ -52,7 +47,7 @@ execute program = execute' 0 1 empty
       | ir > n = Right acc -- Normal termination
       | ir `member` set = Left acc -- Infinity loop
       | otherwise = case program ! ir of
-            Nop -> execute' acc (ir + 1) set'
+            Nop _ -> execute' acc (ir + 1) set'
             Acc x -> execute' (acc + x) (ir + 1) set'
             Jmp x -> execute' acc (ir + x) set'
       where
