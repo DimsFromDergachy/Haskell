@@ -65,14 +65,14 @@ jobs:
     - name: Check resubmition
       id: check
       run: |
-        curl -# -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR} > stars
         if [ ${PART} -eq 1 ]
         then
-          cat stars | grep -q -E "Day ${DAY}, one star|Day ${DAY}, two stars"
+          PATTERN="Day ${DAY}, one star|Day ${DAY}, two stars"
         else
-          cat stars | grep -q -E "Day ${DAY}, two stars"
+          PATTERN="Day ${DAY}, two stars"
         fi
-        if [ $? -eq 0 ]
+        curl -# -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR} > stars
+        if cat stars | grep -q -E "$PATTERN"
         then
           echo '::set-output name=resubmition::true'
         else
@@ -80,8 +80,9 @@ jobs:
         fi
 
     - name: Submit
-      if: steps.check.outputs.resubmition != true
+      if: steps.check.outputs.resubmition != 'true'
       run: |
+        echo ${{ steps.check.outputs.resubmition }}
         curl -# -X POST -d "level=${PART}&answer=${{ steps.run.outputs.result }}" --raw -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR}/day/${DAY}/answer > result
         cat result | grep '<article>'
         cat result | grep -q -E "That's the right answer!"
