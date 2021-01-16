@@ -22,5 +22,17 @@ partA a = head $ do
   where
     (_, n) = bounds a
 
-main :: IO()
-main = getContents >>= print . partA . parseInput
+partB :: Array Int Int -> Int -> Int
+partB a x = go 1 0 0
+  where
+    go l r sum
+      | sum > x = go (l + 1) r (sum - a ! l)
+      | sum < x = go l (r + 1) (sum + a ! (r + 1))
+      | otherwise = minimum as + maximum as
+      where
+        as = [a ! i | i <- [l .. r]]
+
+main :: IO ()
+main = do
+  array <- fmap parseInput getContents
+  print $ partB array $ partA array
