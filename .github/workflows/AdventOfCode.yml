@@ -56,6 +56,7 @@ jobs:
 
     - name: Get puzzle input
       run: curl -# -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR}/day/${DAY}/input > input
+
     - name: Run
       id: run
       run: |
@@ -82,13 +83,13 @@ jobs:
     - name: Submit
       if: steps.check.outputs.resubmition != 'true'
       run: |
-        echo ${{ steps.check.outputs.resubmition }}
-        curl -# -X POST -d "level=${PART}&answer=${{ steps.run.outputs.result }}" --raw -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR}/day/${DAY}/answer > result
+        curl -# -X POST -d "level=${PART}&answer=${{ steps.run.outputs.result }}"
+          --raw -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR}/day/${DAY}/answer > result
         cat result | grep '<article>'
         cat result | grep -q -E "That's the right answer!"
 
-    - name: Update Readme
-      #if: steps.check.outputs.resubmition != 'true'
+    - name: Update Readme 'A'
+      if: steps.check.outputs.resubmition != 'true' && env.PART == 1
       run: |
         answer="${{ steps.run.outputs.result }}"
         search="(Day ${DAY}).*$"
@@ -97,12 +98,28 @@ jobs:
         sed --in-place -r -e "$script" README.md
       working-directory: .
 
-    - name: Commit Readme
-      #if: steps.check.outputs.resubmition != 'true'
+    - name: Update Readme 'B'
+      if: env.PART == 1 # TODO: Part 2
       run: |
-        git config user.name github-actions
+        answer="${{ steps.run.outputs.result }}"
+        search="(\| Day ${Day} \| .*) \| \| ⭐ \|"
+        replace="\1 \| $answer \| ⭐⭐ \|"
+        script="s/$search/$replace/1"
+        sed --in-place -r -e "$script" README.md
+      working-directory: .
+
+    - name: Commit Readme
+      if: steps.check.outputs.resubmition != 'true'
+      run: |
+        if [ ${PART} -eq 1 ]
+        then
+          day="Day ${DAY}A"
+        else
+          day="Day ${DAY}B"
+        fi
+        git config user.name 'CI Bot'
         git config user.email github-actions@github.com
         git add README.md
-        git commit -m "[CI] Obtain a star for ${DAY}_{PART}"
+        git commit -m "CI Bot: Obtain a star for '$day'"
         git push
       working-directory: .
