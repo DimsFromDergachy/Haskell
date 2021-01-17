@@ -88,6 +88,7 @@ jobs:
         cat result | grep -q -E "That's the right answer!"
 
     - name: Update Readme
+      if: steps.check.outputs.resubmition != 'true'
       run: |
         answer="${{ steps.run.outputs.result }}"
         search="(Day ${DAY}).*$"
@@ -97,9 +98,11 @@ jobs:
       working-directory: .
 
     - name: Commit Readme
+      if: steps.check.outputs.resubmition != 'true'
       run: |
-        git diff
+        git config user.name github-actions
+        git config user.email github-actions@github.com
         git add README.md
         git commit -m "[CI] Obtain a star for ${DAY}_{PART}"
-        git log -1
+        git push
       working-directory: .
