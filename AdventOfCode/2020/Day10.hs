@@ -10,9 +10,9 @@ zipNeighbors :: (a -> a -> b) -> [a] -> [b]
 zipNeighbors f xs  =  zipWith f xs (tail $ cycle xs)
 
 partA :: [Int] -> Int
-partA xs = length (filter (== 1) ds) * length (filter (== 3) ds)
+partA xs = (1 + length (filter (== 1) ds)) * (1 + length (filter (== 3) ds))
   where
-    ds = zipNeighbors (-) $ sort xs
+    ds = zipNeighbors (flip (-)) $ sort xs
 
 main :: IO ()
 main = getContents >>= print . partA . parseInput
