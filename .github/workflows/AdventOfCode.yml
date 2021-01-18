@@ -83,8 +83,7 @@ jobs:
     - name: Submit
       if: steps.check.outputs.resubmition != 'true'
       run: |
-        curl -# -X POST -d "level=${PART}&answer=${{ steps.run.outputs.result }}"
-          --raw -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR}/day/${DAY}/answer > result
+        curl -# -X POST -d "level=${PART}&answer=${{ steps.run.outputs.result }}" --raw -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR}/day/${DAY}/answer > result
         cat result | grep '<article>'
         cat result | grep -q -E "That's the right answer!"
 
