@@ -17,7 +17,7 @@ partA xs = (1 + length (filter (== 1) ds)) * (1 + length (filter (== 3) ds))
 -- d[x] - amount of ways to reach x-th adapter (0 if adapter doesn't exist)
 -- d[x] = d[x-1] + d[x-2] + d[x-3]
 partB :: [Int] -> Int
-partB xs = go 0 [1, 0, 0] xs
+partB xs = go 1 [1, 0, 0] xs
   where
     go _ [d1, d2, d3] [] = d1
     go i [d1, d2, d3] (x:xs)
