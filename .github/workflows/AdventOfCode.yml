@@ -101,7 +101,7 @@ jobs:
       if: steps.check.outputs.resubmition != 'true' && env.PART == 2
       run: |
         answer="${{ steps.run.outputs.result }}"
-        search="(\| Day ${Day} \| .*) \| \| ⭐ \|"
+        search="(\| Day ${DAY} \| .*) \| \| ⭐ \|"
         replace="\1 \| $answer \| ⭐⭐ \|"
         script="s/$search/$replace/1"
         sed --in-place -r -e "$script" README.md
