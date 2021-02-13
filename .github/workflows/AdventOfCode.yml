@@ -55,7 +55,14 @@ jobs:
       run:  cabal build AdventOfCode${YEAR}:Day${DAY} --enable-tests --enable-benchmarks
 
     - name: Get puzzle input
-      run: curl -# -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR}/day/${DAY}/input > input
+      run: |
+        STATUS=$(curl -b "session=${SESSION_ID}" \
+          ${BASE_URL}/${YEAR}/day/${DAY}/input -O \
+          -w '%{http_code}' -s)
+        if [ $STATUS -eq 400 ]; then
+          echo 'Token has been expired'
+          return 1
+        fi
 
     - name: Run
       id: run
@@ -66,13 +73,12 @@ jobs:
     - name: Check resubmition
       id: check
       run: |
-        if [ ${PART} -eq 1 ]
-        then
+        if [ ${PART} -eq 1 ]; then
           PATTERN="Day ${DAY}, one star|Day ${DAY}, two stars"
         else
           PATTERN="Day ${DAY}, two stars"
         fi
-        curl -# -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR} > stars
+        curl -# -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR} -o stars
         if cat stars | grep -q -E "$PATTERN"
         then
           echo '::set-output name=resubmition::true'
@@ -83,7 +89,8 @@ jobs:
     - name: Submit
       if: steps.check.outputs.resubmition != 'true'
       run: |
-        curl -# -X POST -d "level=${PART}&answer=${{ steps.run.outputs.result }}" --raw -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR}/day/${DAY}/answer > result
+        curl -# -X POST -d "level=${PART}&answer=${{ steps.run.outputs.result }}" \
+          --raw -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR}/day/${DAY}/answer -o result
         cat result | grep '<article>'
         cat result | grep -q -E "That's the right answer!"
 
@@ -122,3 +129,13 @@ jobs:
         git commit -m "CI Bot: Obtain a star for '$day'"
         git push
       working-directory: .
+
+    - name: Debug failure
+      if: ${{ failure() }}
+      run: |
+        echo 'cat input'
+        cat input
+        echo 'cat stars'
+        cat stars
+        echo 'cat result'
+        cat result
