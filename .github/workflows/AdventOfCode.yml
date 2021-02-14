@@ -12,7 +12,6 @@ env:
   SESSION_ID: ${{ secrets.ADVENTOFCODE_SESSION_ID }}
   YEAR: 2020
   DAY: 12
-  PART: 2
 
 defaults:
   run:
@@ -70,46 +69,52 @@ jobs:
         output=$(cabal --verbose=0 run AdventOfCode${YEAR}:Day${DAY} < input)
         echo '::set-output name=result::'$output
 
-    - name: Check resubmition
+    - name: Get the part
       id: check
       run: |
-        if [ ${PART} -eq 1 ]; then
-          PATTERN="Day ${DAY}, one star|Day ${DAY}, two stars"
-        else
-          PATTERN="Day ${DAY}, two stars"
-        fi
-        curl -# -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR} -o stars
-        if cat stars | grep -q -E "$PATTERN"
-        then
+        ONE_STAR_PATTERN="Day ${DAY}, one star"
+        TWO_STARS_PATTERN="Day ${DAY}, two stars"
+
+        curl -# -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR} -o main
+
+        if cat main | grep -q -E "$TWO_STARS_PATTERN"; then
+          echo 'Both parts of the puzzle are complete! They provide two gold stars: **'
           echo '::set-output name=resubmition::true'
+        elif cat main | grep -q -E "$ONE_STAR_PATTERN"; then
+          echo '::set-output name=resubmition::false'
+          echo '::set-output name=part::2'
         else
           echo '::set-output name=resubmition::false'
+          echo '::set-output name=part::1'
         fi
 
     - name: Submit
       if: steps.check.outputs.resubmition != 'true'
       run: |
-        curl -# -X POST -d "level=${PART}&answer=${{ steps.run.outputs.result }}" \
-          --raw -b "session=${SESSION_ID}" ${BASE_URL}/${YEAR}/day/${DAY}/answer -o result
+        PART="${{ steps.check.outputs.part }}"
+        ANSWER="${{ steps.run.outputs.result }}"
+        curl -# -X POST -d "level=$PART&answer=$ANSWER" \
+          ${BASE_URL}/${YEAR}/day/${DAY}/answer \
+          --raw -b "session=${SESSION_ID}" -o result
         cat result | grep '<article>'
         cat result | grep -q -E "That's the right answer!"
 
-    - name: Update Readme 'A'
-      if: steps.check.outputs.resubmition != 'true' && env.PART == 1
+    - name: Update Readme
+      if: steps.check.outputs.resubmition != 'true'
       run: |
-        answer="${{ steps.run.outputs.result }}"
-        search="(Day ${DAY}).*$"
-        replace="\| \1 \| $answer \| \| ⭐ \|"
-        script="s/$search/$replace/1"
-        sed --in-place -r -e "$script" README.md
-      working-directory: .
-
-    - name: Update Readme 'B'
-      if: steps.check.outputs.resubmition != 'true' && env.PART == 2
-      run: |
-        answer="${{ steps.run.outputs.result }}"
-        search="(\| Day ${DAY} \| .*) \| \| ⭐ \|"
-        replace="\1 \| $answer \| ⭐⭐ \|"
+        PART="${{ steps.check.outputs.part }}"
+        if [$PART -eq 1]; then
+          answer="${{ steps.run.outputs.result }}"
+          search="(Day ${DAY}).*$"
+          replace="\| \1 \| $answer \| \| ⭐ \|"
+        elif [$PART -eq 2]; then
+          answer="${{ steps.run.outputs.result }}"
+          search="(\| Day ${DAY} \| .*) \| \| ⭐ \|"
+          replace="\1 \| $answer \| ⭐⭐ \|"
+        else
+          echo "Unknown part: '$PART'"
+          return 1
+        fi
         script="s/$search/$replace/1"
         sed --in-place -r -e "$script" README.md
       working-directory: .
@@ -117,16 +122,19 @@ jobs:
     - name: Commit Readme
       if: steps.check.outputs.resubmition != 'true'
       run: |
-        if [ ${PART} -eq 1 ]
-        then
-          day="Day ${DAY}A"
+        PART="${{ steps.check.outputs.part }}"
+        if [ $PART -eq 1 ]; then
+          MESSAGE="[CI Bot]: Obtain the first star for 'Day ${DAY}'"
+        elif [ $PART -eq 2 ]; then
+          MESSAGE="[CI Bot]: Obtain the second star for 'Day ${DAY}'"
         else
-          day="Day ${DAY}B"
+          echo "Unknown part: '$PART'"
+          return 1
         fi
         git config user.name 'CI Bot'
         git config user.email github-actions@github.com
         git add README.md
-        git commit -m "CI Bot: Obtain a star for '$day'"
+        git commit -m "$MESSAGE"
         git push
       working-directory: .
 
@@ -135,7 +143,7 @@ jobs:
       run: |
         echo 'cat input'
         cat input
-        echo 'cat stars'
-        cat stars
+        echo 'cat main'
+        cat main
         echo 'cat result'
         cat result
