@@ -11,8 +11,8 @@ env:
   BASE_URL: https://adventofcode.com
   SESSION_ID: ${{ secrets.ADVENTOFCODE_SESSION_ID }}
   YEAR: 2020
-  DAY: 11
-  PART: 2
+  DAY: 12
+  PART: 1
 
 defaults:
   run:
