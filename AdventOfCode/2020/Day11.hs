@@ -1,7 +1,7 @@
 -- Day 11: Seating System
 -- https://adventofcode.com/2020/day/11
 
-import Control.Monad (forM_)
+import Control.Monad (guard, forM_)
 import Data.Array (Ix, inRange)
 import Data.Array (Array, (!), assocs, bounds, elems, listArray)
 
@@ -14,17 +14,32 @@ parse content = listArray bounds $ concat ls
     (n,m) = (length ls, length $ head ls)
     bounds = ((1,1), (n,m))
 
-neighbors :: Area -> (Int, Int) -> Int
-neighbors area = length . filter (== '#') . neighbors' area
+neighborsI :: Area -> (Int, Int) -> Int
+neighborsI area = length . filter (== '#') . neighbors'
   where
-    neighbors' :: Area -> (Int, Int) -> [Char]
-    neighbors' array (i, j) = map (array !) ixs
+    neighbors' :: (Int, Int) -> [Char]
+    neighbors' (i, j) = map (area !) ixs
       where
-        ixs = filter (inRange (bounds array))
+        ixs = filter (inRange (bounds area))
           [(i + di, j + dj) | di <- [-1 .. 1], dj <- [-1 .. 1], di /= 0 || dj /= 0]
 
-next :: Area -> Area
-next area = listArray (bounds area) $ map next' $ assocs area
+neighborsII :: Area -> (Int, Int) -> Int
+neighborsII area = length . filter (== '#') . neighbors'
+  where
+    (n, m) = snd $ bounds area
+    neighbors' :: (Int, Int) -> [Char]
+    neighbors' (i, j) = do
+      (di, dj) <- directions
+      let ixs = takeWhile (inRange (bounds area))
+            $ [(i + k * di, j + k * dj) | k <- [1..]]
+      let ns = filter (/= '.') $ map (area !) ixs
+      guard $ not $ null ns
+      return $ head ns
+
+    directions = [(di, dj) | di <- [-1 .. 1], dj <- [-1 .. 1], di /= 0 || dj /= 0]
+
+nextI :: Area -> Area
+nextI area = listArray (bounds area) $ map next' $ assocs area
   where
     next' (i, s) = case (s, ns) of
       ('.', _) -> '.'
@@ -36,16 +51,35 @@ next area = listArray (bounds area) $ map next' $ assocs area
       ('#', 3) -> '#'
       ('#', _) -> 'L'
       where
-        ns = neighbors area i
+        ns = neighborsI area i
+
+nextII :: Area -> Area
+nextII area = listArray (bounds area) $ map next' $ assocs area
+  where
+    next' (i, s) = case (s, ns) of
+      ('.', _) -> '.'
+      ('L', 0) -> '#'
+      ('L', _) -> 'L'
+      ('#', 0) -> '#'
+      ('#', 1) -> '#'
+      ('#', 2) -> '#'
+      ('#', 3) -> '#'
+      ('#', 4) -> '#'
+      ('#', _) -> 'L'
+      where
+        ns = neighborsII area i
 
 -- TODO: Use Fix
-iteration :: Area -> Area
-iteration a
-  | next a == a = a
-  | otherwise = iteration (next a)
+iteration :: (Area -> Area) -> Area -> Area
+iteration f a
+  | f a == a = a
+  | otherwise = iteration f (f a)
 
 partI :: Area -> Int 
-partI = length . filter (== '#') . elems . iteration
+partI = length . filter (== '#') . elems . iteration nextI
+
+partII :: Area -> Int
+partII = length . filter (== '#') . elems . iteration nextII
 
 -- print' :: Area -> IO ()
 -- print' area = do
@@ -56,4 +90,4 @@ partI = length . filter (== '#') . elems . iteration
 --     putStrLn ""
 
 main :: IO()
-main = getContents >>= print . partI . parse
+main = getContents >>= print . partII . parse
