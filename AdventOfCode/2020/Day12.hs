@@ -1,26 +1,26 @@
 -- Day 12: Rain Risk
 -- https://adventofcode.com/2020/day/12
 
-type Direction = (Int, Int)
 type Position = (Int, Int)
-type Ship = (Direction, Position)
+type WayPoint = Position
+type Ship = (WayPoint, Position)
 
 start :: Ship
-start = ((1, 0), (0, 0))
+start = ((10, 1), (0, 0))
 
-left, right :: Direction -> Direction
+left, right :: Position -> Position
 left  (dx, dy) = (-dy, dx)
 right (dx, dy) = (dy, -dx)
 
 move :: Ship -> String -> Ship
-move ((dx, dy), (x, y)) line = case c of
-    'E' -> ((dx, dy), (x + z, y))
-    'S' -> ((dx, dy), (x, y - z))
-    'W' -> ((dx, dy), (x - z, y))
-    'N' -> ((dx, dy), (x, y + z))
-    'F' -> ((dx, dy), (x + dx * z, y + dy * z))
-    'L' -> (turn left (dx, dy), (x, y))
-    'R' -> (turn right (dx, dy), (x, y))
+move (wayPoint@(wx, wy), ship@(sx, sy)) line = case c of
+    'E' -> ((wx + z, wy), ship)
+    'S' -> ((wx, wy - z), ship)
+    'W' -> ((wx - z, wy), ship)
+    'N' -> ((wx, wy + z), ship)
+    'F' -> (wayPoint, (sx + z * wx, sy + z * wy))
+    'L' -> (turn left wayPoint, ship)
+    'R' -> (turn right wayPoint, ship)
   where
     (c, z) = (head line, read $ tail line)
     turn f = foldl (.) id (replicate (z `div` 90) f)
@@ -28,8 +28,8 @@ move ((dx, dy), (x, y)) line = case c of
 distance :: Ship -> Int
 distance (_, (x, y)) = abs x + abs y
 
-partI :: [String] -> Int 
-partI = distance . foldl move start
+partII :: [String] -> Int 
+partII = distance . foldl move start
 
 main :: IO ()
-main = getContents >>= print . partI . lines
+main = getContents >>= print . partII . lines
