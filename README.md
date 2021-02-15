@@ -27,3 +27,4 @@ A pet project which helps to solve small katas (puzzles) on Haskell. Powered by 
 | Day 10 | 2272 | 84627647627264 | ⭐⭐ |
 | Day 11 | 2472 | 2197 | ⭐⭐ |
 | Day 12 | 1956 | 126797 | ⭐⭐ |
+| Day 13 | 3882 | | ⭐ |
