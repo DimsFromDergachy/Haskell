@@ -103,11 +103,11 @@ jobs:
       if: steps.check.outputs.resubmition != 'true'
       run: |
         PART="${{ steps.check.outputs.part }}"
-        if [$PART -eq 1]; then
+        if [ $PART = "1" ]; then
           answer="${{ steps.run.outputs.result }}"
           search="(Day ${DAY}).*$"
           replace="\| \1 \| $answer \| \| ⭐ \|"
-        elif [$PART -eq 2]; then
+        elif [ $PART = "2" ]; then
           answer="${{ steps.run.outputs.result }}"
           search="(\| Day ${DAY} \| .*) \| \| ⭐ \|"
           replace="\1 \| $answer \| ⭐⭐ \|"
@@ -123,9 +123,9 @@ jobs:
       if: steps.check.outputs.resubmition != 'true'
       run: |
         PART="${{ steps.check.outputs.part }}"
-        if [ $PART -eq 1 ]; then
+        if [ $PART = "1" ]; then
           MESSAGE="[CI Bot]: Obtain the first star for 'Day ${DAY}'"
-        elif [ $PART -eq 2 ]; then
+        elif [ $PART = "2" ]; then
           MESSAGE="[CI Bot]: Obtain the second star for 'Day ${DAY}'"
         else
           echo "Unknown part: '$PART'"
