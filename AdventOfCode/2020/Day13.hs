@@ -8,7 +8,7 @@ import Data.Maybe (fromJust)
 import Math.NumberTheory.Moduli.Chinese (chinese)
 
 parse :: String -> [(Integer, Integer)]
-parse = map (second $ negate . read) . filter ((/= "x") . snd) . zip [1..] . splitOn ","
+parse = map (second $ negate . read) . filter ((/= "x") . snd) . zip [0..] . splitOn ","
 
 partI :: Integer -> [(Integer, Integer)] -> Integer
 partI start buses = (depart - start) * bus
