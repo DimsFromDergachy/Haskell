@@ -28,7 +28,7 @@ chinese' = foldl1 f
 
 partII :: Integer -> [(Integer, Integer)] -> Integer
 partII start buses
-  | z < a' = start + (a' - z)
+  | z <= a' = start + (a' - z)
   | otherwise = start + (a' - z + n)
   where
     (a, n) = chinese' buses
