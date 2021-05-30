@@ -20,3 +20,6 @@ cradle:
       # Advent Of Code 2020
         - path: "./AdventOfCode/2020"
           component: "AdventOfCode2020:exe:Day14"
+      # Pentamino
+        - path: "./Pentamino"
+          component: "Pentamino:exe:Pentamino"

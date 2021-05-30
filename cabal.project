@@ -2,3 +2,4 @@ packages: HackerRank/ConcavePolygon
 packages: HackerRank/Fibonacci
 packages: HackerRank/DicePath
 packages: AdventOfCode/2020/*.cabal
+packages: Pentamino

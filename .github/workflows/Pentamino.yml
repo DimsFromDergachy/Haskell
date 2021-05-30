@@ -1,0 +1,28 @@
+name: Pentamino
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+    - '**/Pentamino/**'
+    - '.github/workflows/Pentamino.yml'
+
+defaults:
+  run:
+    working-directory: ./Pentamino
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-haskell@v1
+      with:
+        ghc-version: '8.10.2'
+        cabal-version: '3.4'
+
+    - name: Run
+      run:  cabal run Pentamino:Pentamino
+
+
