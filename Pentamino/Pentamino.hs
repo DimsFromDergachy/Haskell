@@ -1,8 +1,9 @@
-
-import Control.Monad (guard)
-import Data.List (intersperse)
-import Data.Map as Map (Map(..), (!), keys, fromList)
+import Control.Monad (guard, forM_, void)
+import Data.Map as Map (Map(..), (!), fromList)
+import Data.Maybe (isJust, fromMaybe)
 import Data.Set as Set (Set(..), empty, fromList)
+import GHC.Arr (Array, (!), (//), bounds, listArray, array, assocs)
+import GHC.Ix (inRange)
 
 {-
     ╔═══════╗
@@ -13,6 +14,9 @@ import Data.Set as Set (Set(..), empty, fromList)
     ║ ..... ║
     ╚═══════╝
 -}
+
+type Point = (Int, Int)
+type Points = [Point]
 
 data Phigure = Phigure {
     name :: Char,
@@ -60,12 +64,16 @@ pentaminos = Map.fromList [
     _4ways = (.) <$> mirroring <*> rotation2
     _8ways = (.) <$> mirroring <*> rotation4
 
+rotate :: Points -> Points
+rotate = fmap $ \(x, y) -> (-y, x)
+
+mirror :: Points -> Points
+mirror = fmap $ \(x, y) -> (-x, y)
+
+-- TODO: Move out
+-------------------- DRAW --------------------
 data Direction = N | E | S | W
     deriving (Eq, Ord, Enum)
-
-type Point = (Int, Int)
-type Points = [Point]
---type Phigure = [Points] -- a list of possible transformations: rotates/mirrors
 
 offsets :: Direction -> [(Int, Int)]
 offsets N = [(-1, 1), (1, 1)]
@@ -73,7 +81,6 @@ offsets E = [(1, 1), (1, -1)] ++ [(0, -1), (0, 1)]
 offsets S = [(1, -1), (-1, -1)] 
 offsets W = [(-1, -1), (-1, 1)] ++ [(0, -1), (0, 1)]
 
--- TODO: Move out
 draw :: Points -> [String]
 draw ps = do
     j <- reverse [-5 .. 5]
@@ -106,15 +113,59 @@ drawMap = Map.fromList [
         (Set.fromList [N, E, S, W], '╬')
     ]
 
-rotate :: Points -> Points
-rotate = fmap $ \(x, y) -> (-y, x)
+printBoard :: Board -> IO ()
+printBoard board = do
+    let (m, n) = snd $ bounds board
+    forM_ [1..m] $ \i -> do
+        putStrLn $ [fromMaybe '.' $ board GHC.Arr.! (i, j) | j <- [1..n]]
 
-mirror :: Points -> Points
-mirror = fmap $ \(x, y) -> (-x, y)
+--------------------  BOARD  --------------------
+type Board = Array (Int, Int) (Maybe Char)
+
+empty :: (Int, Int) -> Board
+empty (m, n) = listArray ((1, 1), (m, n)) $ repeat Nothing
+
+full :: Board -> Bool
+full = isJust . traverse void
+
+hole :: Board -> (Int, Int)
+hole = fst . head . filter ((== Nothing) . snd) . assocs
+
+puts :: Board -> Phigure -> [Board]
+puts board (Phigure ch ts)
+  | full board = []
+  | otherwise  = do
+      ps <- ts
+      (x0, y0) <- ps
+      let (xh, yh) = hole board
+      let ps' = map (\(x, y) -> (x - x0 + xh, y - y0 + yh)) ps
+      guard $ all (inRange (bounds board)) ps'
+      guard $ all ((== Nothing) . (board GHC.Arr.!)) ps'
+      return $ board // [(p, Just ch) | p <- ps']
+
+solver :: Board -> [Phigure] -> [Board]
+solver board [] = do
+    guard $ full board
+    return board
+solver board phs = do
+    (ph, phs') <- taker phs
+    board' <- puts board ph
+    solver board' phs'
+
+taker :: [a] -> [(a, [a])]
+taker xs = taker' [] xs
+  where
+    taker' _ [] = []
+    taker' xs (x:xs') = (x, xs ++ xs') : taker' (x:xs) xs'
 
 main ::IO ()
 main = do
-    mapM_ (\ch -> do
-        putStrLn $ concat [replicate 10 '=', " ", [ch], " ", replicate 10 '=']
-        mapM_ (mapM_ putStrLn . draw) $ transforms $ phigure ch)
-        $ Map.keys pentaminos
+    let xs = solver (Main.empty (6, 10))
+           $ map phigure ['F', 'I', 'L', 'P', 'N', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+
+    forM_ xs $ \x -> do
+        printBoard x
+        putStrLn "===================="
+        putStrLn ""
+
+    putStrLn $ concat ["There is/are ", show (length xs), " solution(s)"]
