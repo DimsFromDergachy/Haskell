@@ -1,7 +1,6 @@
 import Control.Monad (guard, forM_, void)
 import Data.Map as Map (Map(..), (!), fromList)
-import Data.Maybe (isJust, fromMaybe)
-import Data.Set as Set (Set(..), empty, fromList)
+import Data.Maybe (isJust, isNothing)
 import GHC.Arr (Array, (!), (//), bounds, listArray, array, assocs)
 import GHC.Ix (inRange)
 
@@ -31,7 +30,7 @@ phigure ch = Phigure ch $ transforms <*> pure ps
 type Transform = (Points -> Points)
 
 pentaminos :: Map Char (Points, [Transform])
-pentaminos = Map.fromList [
+pentaminos = fromList [
     ('F', ([(0, 1), (1, 1), (-1, 0), (0, 0), (0, -1)]
         , _8ways)),
     ('I', ([(0, 2), (0, 1), (0, 0), (0, -1), (0, -2)]
@@ -72,52 +71,58 @@ mirror = fmap $ \(x, y) -> (-x, y)
 
 -- TODO: Move out
 -------------------- DRAW --------------------
-data Direction = N | E | S | W
-    deriving (Eq, Ord, Enum)
+drawCell :: Board -> (Int, Int) -> [String]
+drawCell board (i, j)
+    | isNothing cell = replicate (fst size) $ replicate (snd size) ' '
+    | otherwise      =
+        [
+            [drawNW, drawEW, drawEW, drawEW, drawEW, drawNE],
+            [drawNS,  ' ',    '●',    '●',    ' ',   drawNS],
+            [drawSW, drawEW, drawEW, drawEW, drawEW, drawSE]
+        ]
+  where
+    size  = (3, 6)
+    boardSize = bounds board
+    cell  = board GHC.Arr.! (i, j)
+    north = guard (inRange boardSize (i - 1, j)) >> board GHC.Arr.! (i - 1, j)
+    east  = guard (inRange boardSize (i, j + 1)) >> board GHC.Arr.! (i, j + 1)
+    south = guard (inRange boardSize (i + 1, j)) >> board GHC.Arr.! (i + 1, j)
+    west  = guard (inRange boardSize (i, j - 1)) >> board GHC.Arr.! (i, j - 1)
+    drawEW = '═'
+    drawNS = '║'
+    drawNW
+      | cell == north && cell == west  =  '╬'
+      | cell == north                  =  '╠'
+      |                  cell == west  =  '╦'
+      |            otherwise           =  '╔'
+    drawNE
+      | cell == north && cell == east  =  '╬'
+      | cell == north                  =  '╣'
+      |                  cell == east  =  '╦'
+      |            otherwise           =  '╗'
+    drawSW
+      | cell == south && cell == west  =  '╬'
+      | cell == south                  =  '╠'
+      |                  cell == west  =  '╩'
+      |            otherwise           =  '╚'
+    drawSE
+      | cell == south && cell == east  =  '╬'
+      | cell == south                  =  '╣'
+      |                  cell == east  =  '╩'
+      |            otherwise           =  '╝'
 
-offsets :: Direction -> [(Int, Int)]
-offsets N = [(-1, 1), (1, 1)]
-offsets E = [(1, 1), (1, -1)] ++ [(0, -1), (0, 1)]
-offsets S = [(1, -1), (-1, -1)] 
-offsets W = [(-1, -1), (-1, 1)] ++ [(0, -1), (0, 1)]
-
-draw :: Points -> [String]
-draw ps = do
-    j <- reverse [-5 .. 5]
-    guard $ odd j
-    return $ do
-        i <- [-5 .. 5]
-        let set = Set.fromList $ do 
-                d <- [N .. W]
-                (dx, dy) <- offsets d
-                guard $ (i + dx, j + dy) `elem` ps'
-                return d
-        return $ (Map.!) drawMap set
-    where
-      ps' = fmap (\(x, y) -> (x*2, y*2)) ps
-
-
-drawMap :: Map (Set Direction) Char
-drawMap = Map.fromList [
-        (Set.empty,                 ' '),
-        (Set.fromList [N, S],       '║'),
-        (Set.fromList [E, W],       '═'),
-        (Set.fromList [E, S],       '╔'),
-        (Set.fromList [S, W],       '╗'),
-        (Set.fromList [N, E],       '╚'),
-        (Set.fromList [N, W],       '╝'),
-        (Set.fromList [E, S, W],    '╦'),
-        (Set.fromList [N, S, W],    '╣'),
-        (Set.fromList [N, E, W],    '╩'),
-        (Set.fromList [N, E, S],    '╠'),
-        (Set.fromList [N, E, S, W], '╬')
-    ]
-
-printBoard :: Board -> IO ()
-printBoard board = do
-    let (m, n) = snd $ bounds board
-    forM_ [1..m] $ \i -> do
-        putStrLn $ [fromMaybe '.' $ board GHC.Arr.! (i, j) | j <- [1..n]]
+drawBoard :: Board -> IO ()
+drawBoard board = do
+    forM_ [1..n] $ \i -> do
+        let cells = map (\j -> drawCell board (i, j)) [1..m]
+        let cells' = foldr (zipWith glueLines) [[], [], []] cells
+        mapM_ putStrLn cells'
+  where
+    (n, m) = snd $ bounds board
+    glueLines xs [] = xs
+    glueLines xs ys
+      | last xs `elem` ['╬', '╠', '╦', '╩', '╔', '╚'] = xs ++ ('═' : ys)
+      | otherwise = xs ++ (' ' : ys)
 
 --------------------  BOARD  --------------------
 type Board = Array (Int, Int) (Maybe Char)
@@ -163,9 +168,4 @@ main = do
     let xs = solver (Main.empty (6, 10))
            $ map phigure ['F', 'I', 'L', 'P', 'N', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
-    forM_ xs $ \x -> do
-        printBoard x
-        putStrLn "===================="
-        putStrLn ""
-
-    putStrLn $ concat ["There is/are ", show (length xs), " solution(s)"]
+    drawBoard $ head xs
