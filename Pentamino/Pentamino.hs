@@ -119,10 +119,10 @@ drawBoard board = do
         mapM_ putStrLn cells'
   where
     (n, m) = snd $ bounds board
-    glueLines xs [] = xs
-    glueLines xs ys
-      | last xs `elem` ['╬', '╠', '╦', '╩', '╔', '╚'] = xs ++ ('═' : ys)
-      | otherwise = xs ++ (' ' : ys)
+    glueLines left [] = left
+    glueLines left right
+      | last left `elem` ['╬', '╠', '╦', '╩', '╔', '╚'] = left ++ ('═' : right)
+      | otherwise = left ++ (' ' : right)
 
 --------------------  BOARD  --------------------
 type Board = Array (Int, Int) (Maybe Char)
