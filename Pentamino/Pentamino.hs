@@ -1,8 +1,9 @@
 import Control.Monad (guard, forM_, void)
 import Data.Map as Map (Map(..), (!), fromList)
-import Data.Maybe (isJust, isNothing)
+import Data.Maybe (isJust, isNothing, fromMaybe)
 import GHC.Arr (Array, (!), (//), bounds, listArray, array, assocs)
 import GHC.Ix (inRange)
+import System.Environment (lookupEnv)
 
 {-
     ╔═══════╗
@@ -165,7 +166,8 @@ taker xs = taker' [] xs
 
 main ::IO ()
 main = do
-    let xs = solver (Main.empty (6, 10))
-           $ map phigure ['F', 'I', 'L', 'P', 'N', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    puzzleSize <- read . fromMaybe  "(6, 10)" <$> lookupEnv "PENTAMINO_SIZE"
 
+    let xs = solver (empty puzzleSize)
+            $ map phigure ['F', 'I', 'L', 'P', 'N', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
     drawBoard $ head xs

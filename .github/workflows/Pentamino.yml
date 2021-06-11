@@ -14,6 +14,9 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        puzzle: ["(3, 20)", "(4, 15)", "(5, 12)", "(6, 10)", "(10, 6)", "(12, 5)", "(15, 4)", "(20, 3)"]
 
     steps:
     - uses: actions/checkout@v2
@@ -24,5 +27,7 @@ jobs:
 
     - name: Run
       run:  cabal run Pentamino:Pentamino
+      with:
+        PENTAMINO_SIZE = ${{ matrix.puzzle }}
 
 
