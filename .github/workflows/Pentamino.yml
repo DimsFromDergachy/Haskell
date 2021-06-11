@@ -27,7 +27,7 @@ jobs:
 
     - name: Run
       run:  cabal run Pentamino:Pentamino
-      with:
-        PENTAMINO_SIZE = ${{ matrix.puzzle }}
+      env:
+        PENTAMINO_SIZE: ${{ matrix.puzzle }}
 
 
